@@ -1,0 +1,16 @@
+INFORMATION:
+CTS-
+1 Bank Logo in UV ink
+2 Printer name with CTS-2010
+3 Void Pantograph
+4 Micro-lettering
+5 Date
+6 Rupee Symbol
+7 Signature
+8 Account Number
+As a scanned image obtained from the scanner can not be
+used directly thus we needed to pre-process it, which involved two primary
+operations, i.e, rotation and removal of unnecessary background information.
+In this step, we rotated the scanned image with respect to the ‘Date Box’
+and then removed the background noise and extra information. Efficiency of
+the parameter identification considerably improves with removal of extra background information.

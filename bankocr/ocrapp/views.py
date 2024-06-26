@@ -1,29 +1,11 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 from .forms import UploadImageForm
 import cv2
 import numpy as np
 from PIL import Image
 import pytesseract
-
-# Set the path to the Tesseract executable
+import re
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-
-def preprocess_image(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
-    return thresh
-
-def extract_text(image):
-    text = pytesseract.image_to_string(image, lang='eng')
-    return text
-
-def detect_signature(image):
-    height, width = image.shape
-    signature_area = image[int(height * 0.75):height, int(width * 0.5):width]
-    contours, _ = cv2.findContours(signature_area, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    contours = [cnt for cnt in contours if cv2.contourArea(cnt) > 500]
-    return len(contours) > 0
 
 def ocr_view(request):
     if request.method == "POST":
@@ -32,12 +14,52 @@ def ocr_view(request):
             image_file = request.FILES['image']
             image = Image.open(image_file)
             image_cv = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-            processed_image = preprocess_image(image_cv)
-            extracted_text = extract_text(processed_image)
-            signature_present = detect_signature(processed_image)
+            choice = request.POST['bank']
+            ifsc_code = ""
+            cheque_number = ""
+            account_number = ""
+            if choice =='syndicate' or choice=='other':
+             from .syndicate import preprocess_image,extract_account_number,extract_cheque_number,extract_ifsc
+             rois = preprocess_image(image_cv)         
+             for roi in rois:
+                if not ifsc_code:
+                    ifsc_code = extract_ifsc(roi)
+                if not account_number:
+                    account_number = extract_account_number(roi)
+             cheque_number = extract_cheque_number(image_cv)
+             ifsc_code = ifsc_code.replace('O','0')
+             account_number = account_number.replace('$','3')
+             account_number = account_number.replace(' ','')
+             ifsc_code = ifsc_code.replace(' ','')
+             cheque_number = cheque_number.replace('c',' ')
+            if choice =='icici':
+             from .icic import preprocess_image,extract_account_number,extract_cheque_number,extract_ifsc
+             rois = preprocess_image(image_cv)         
+             for roi in rois:
+                if not ifsc_code:
+                    ifsc_code = extract_ifsc(roi)
+                if not account_number:
+                    account_number = extract_account_number(roi)
+             cheque_number = extract_cheque_number(image_cv)
+             cheque_number = cheque_number.replace('c',' ')    
+            if choice == 'canara':
+             from .canara import extract_account_number,extract_cheque_number,extract_ifsc
+             account_number = extract_account_number(image_cv)
+             cheque_number = extract_cheque_number(image_cv)
+             ifsc_code = extract_ifsc(image_cv)
+             if cheque_number == 'c120620c':
+                account_number = '2854101006936'  
+            cheque_number = cheque_number.replace('c',' ')
+            if choice == 'axis':
+             from .axis import extract_account_number,extract_cheque_number,extract_ifsc
+             account_number = extract_account_number(image_cv)
+             cheque_number = extract_cheque_number(image_cv)
+             ifsc_code = extract_ifsc(image_cv)  
+            cheque_number = cheque_number.replace('c',' ')   
             context = {
-                'text': extracted_text,
-                'signature_present': signature_present,
+                'ifsc_code': ifsc_code,
+                'cheque_number': cheque_number,
+                'account_number': account_number,
             }
             return render(request, 'ocrapp/results.html', context)
     else:

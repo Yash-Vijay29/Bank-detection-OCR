@@ -36,10 +36,6 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
-        .signature {
-            color: #4CAF50;
-            font-weight: bold;
-        }
         .upload-another {
             display: block;
             text-align: center;
@@ -52,9 +48,11 @@
     <div class="container">
         <h1>OCR Results</h1>
         <div class="results">
+            <p><strong>IFSC Code:</strong> {{ ifsc_code }}</p>
+            <p><strong>Cheque Number:</strong> {{ cheque_number }}</p>
+            <p><strong>Account Number:</strong> {{ account_number }}</p>
             <p><strong>Extracted Text:</strong></p>
-            <pre>{{ text }}</pre>
-            <p><strong>Signature Present:</strong> <span class="signature">{{ signature_present }}</span></p>
+            <pre>{{ extracted_texts }}</pre>
         </div>
         <a href="{% url 'ocrapp:upload' %}" class="upload-another">Upload another image</a>
     </div>
