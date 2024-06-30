@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333333;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .results p {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .results pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .upload-another {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .signature-image img {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .no-signature {
+            text-align: center;
+            color: red;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OCR Results</h1>
+        <div class="results">
+            <p><strong>IFSC Code:</strong> {{ ifsc_code }}</p>
+            <p><strong>Cheque Number:</strong> {{ cheque_number }}</p>
+            <p><strong>Account Number:</strong> {{ account_number }}</p>
+            <p><strong>Bearer:</strong> {{ transfer_to }}</p>
+            <p><strong>Amount Paid:</strong> {{ transfer_amt }}</p>
+            <p><strong>Amount Paid in eng:</strong> {{ transfer_amt_eng }}</p>
+        </div>
+        
+        {% if signature_present %}
+            <div class="signature-image">
+                <img src="{% static 'temp/roi_signature.png' %}" alt="Signature Image">
+            </div>
+        {% else %}
+            <p class="no-signature">Signature not present.</p>
+        {% endif %}
+        
+        <a href="{% url 'ocrapp:upload' %}" class="upload-another">Upload another image</a>
+    </div>
+</body>
+</html>
