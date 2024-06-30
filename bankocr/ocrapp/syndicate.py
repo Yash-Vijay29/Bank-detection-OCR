@@ -65,3 +65,8 @@ def extract_account_number(image):
         account_number = ""
     return account_number
 
+
+
+
+
+
